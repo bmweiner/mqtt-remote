@@ -4,6 +4,7 @@ sudo cp flirc.list /etc/apt/sources.list.d
 # apt dependencies
 sudo apt update
 sudo apt upgrade
+sudo apt install git
 sudo apt install sense-hat
 sudo apt install flirc
 
