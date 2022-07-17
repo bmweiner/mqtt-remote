@@ -1,25 +1,22 @@
-## FLIRC
+## Hardware
 * Buy the usb dongle
+* Raspberry PI Model 3B+ (2022-04-04-raspios-bullseye-arm64-lite)
 
-## Install flirc_util
+## Install dependencies
 
-1. Add source to `/etc/apt/sources.list`:
-    `deb [trusted=yes] https://apt.fury.io/flirc/ /`
-2. Update: `sudo apt update`
-3. Install: `sudo apt install flirc`
-
-## Setup MQTT client
-
-1. Add source to `/etc/apt/sources.list`:
-    `deb https://repo.mosquitto.org/debian bullseye main`
-2. Update: `sudo apt update`
-3. Install: `sudo apt install mosquitto-clients`
+    sh setup.sh
 
 ## Program remote
 
 1. Follow prompt: `flirc_util record`
 2. Confirm: `flirc_util settings`
 
-## Python Venv
-source infrared/bin/activate
-pip freeze -l > requirements.txt
+## Verify Scripts
+
+1. mqtt-remote.service: verify installation directory and user
+2. main.py: update actions dictionary and device address
+3. main.py: verify local path to mqtt certs and creds
+
+## Reload Service
+
+    sudo systemctl restart mqtt-remote

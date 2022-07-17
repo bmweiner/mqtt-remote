@@ -1,25 +1,72 @@
-import os
-os.environ['PYUSB_DEBUG'] = 'debug'
+from time import sleep
+from evdev import InputDevice, categorize, ecodes
+from sense_hat import SenseHat
+import paho.mqtt.client as mqtt
 
+class Remote():
+    def __init__(self, dev, actions):
+        self.actions = actions
 
-import usb.core
-import usb.util
+        # setup keyboard
+        self.keyboard = InputDevice(dev)
 
+        # setup mqtt
+        client = mqtt.Client()
+        client.on_connect = self._on_connect
+        client.on_message = self._on_message
+        certs = {
+            "ca_certs": "local/certs/ca.crt",
+            "certfile": "local/certs/client.crt",
+            "keyfile": "local/certs/client.key"
+        }
+        client.tls_set(**certs)
+        client.tls_insecure_set(True)
+        with open("local/creds") as f:
+            username, password = f.readlines()[0].split(":")
+        client.username_pw_set(username, password)
+        self.client = client
 
-# flirc device
-dev = usb.core.find(idVendor=0x20a0, idProduct=0x0006)
+        # setup sense hat
+        sense = SenseHat()
+        sense.set_rotation(90)
+        self.sense = sense
 
-# was it found?
-if dev is None:
-    raise ValueError('Device not found')
+    def _on_connect(self, client, userdata, flags, rc):
+        print("Connected with result code "+str(rc))
+        client.subscribe("$SYS/#")
 
-# claim ownership of device
-for cfg in dev:
-  for intf in cfg:
-    print(dev.is_kernel_driver_active(intf.bInterfaceNumber))
-    #   try:
-    #     dev.detach_kernel_driver(intf.bInterfaceNumber)
+    def _on_message(self, client, userdata, msg):
+        print(msg.topic+" "+str(msg.payload))
 
-# set the active configuration. With no arguments, the first
-# configuration will be the active one
-dev.set_configuration()
+    def read_loop(self):
+        for event in self.keyboard.read_loop():
+            # keyboard button pressed
+            if event.type == ecodes.EV_KEY & event.value == 1:
+                code = event.code
+                key = categorize(event).keycode
+
+                # process action for code
+                if code in self.actions:
+                    action = actions[code]
+                    self.sense.clear(action['RGB'])
+                    self.client.connect("ha", 8883)
+                    self.client.publish(action['topic'], action['msg'])
+                    sleep(1)
+                    self.sense.clear()
+
+if __name__ == '__main__':
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    YELLOW = (255, 255, 0)
+    BLUE = (0, 0, 255)
+
+    dev = "/dev/input/by-id/usb-flirc.tv_flirc-if01-event-kbd"
+    actions = {
+        11: {
+            "RGB": RED,
+            "topic": "remote/living_room_light",
+            "msg": "off"
+        }
+    }
+    remote = Remote(dev, actions)
+    remote.read_loop()

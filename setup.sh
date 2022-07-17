@@ -1,22 +1,25 @@
 # apt sources
-sudo cp flirc.list /etc/apt/sources.list.d 
+sudo apt install curl gnupg
+curl https://apt.fury.io/flirc/gpg.key | sudo apt-key add -
+echo "deb [arch=armhf] https://apt.fury.io/flirc/ * *" | sudo tee /etc/apt/sources.list.d/fury.list
 
 # apt dependencies
 sudo apt update
-sudo apt upgrade
 sudo apt install git
+sudo apt install python3-pip
 sudo apt install sense-hat
 sudo apt install flirc
 
-# install pip
-wget https://bootstrap.pypa.io/get-pip.py
-python3 get-pip.py
-rm get-pip.py
-
 # python dependencies
-pip3 install paho-mqtt
-pip3 install pyusb
+python -m pip install paho-mqtt
+python -m pip install evdev
 
-# install flirc rules
-sudo cp 99-flirc.rules /etc/udev/rules.d/
-#sudo udevadm control --reload-rules && sudo udevadm trigger
+sudo dpkg --add-architecture armhf
+sudo apt install libreadline8:armhf
+cd /lib/arm-linux-gnueabihf/; sudo ln -s libreadline.so.8 libreadline.so.6
+
+# install service
+cd /etc/systemd/system; sudo ln -s /home/pi/mqtt-remote/mqtt-remote.service .
+sudo systemctl daemon-reload
+sudo systemctl enable mqtt-remote.service
+sudo systemctl start mqtt-remote.service

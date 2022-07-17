@@ -1,0 +1,13 @@
+[Unit]
+Description=MQTT-Remote Python Service
+After=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/mqtt-remote
+User=pi
+Restart=always
+ExecStart=/usr/bin/python3 /home/pi/mqtt-remote/main.py
+
+[Install]
+WantedBy=multi-user.target
