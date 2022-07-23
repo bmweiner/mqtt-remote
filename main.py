@@ -65,7 +65,7 @@ if __name__ == '__main__':
         11: {
             "RGB": RED,
             "topic": "remote/living_room_light",
-            "msg": "off"
+            "msg": "toggle"
         }
     }
     remote = Remote(dev, actions)
