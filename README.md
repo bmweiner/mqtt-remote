@@ -8,6 +8,8 @@
 
 ## Program remote
 
+> Try using `sudo` if returns: **device disconnected, can't run command**
+
 1. Follow prompt: `flirc_util record`
 2. Confirm: `flirc_util settings`
 
