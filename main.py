@@ -80,8 +80,8 @@ if __name__ == '__main__':
         },
         "KEY_3" : {
             "RGB": BLUE,
-            "topic": "remote/living_room_light",
-            "msg": "toggle"
+            "topic": "remote/tts",
+            "msg": "woa"
         }
     }
     remote = Remote(dev, actions)
