@@ -22,3 +22,8 @@
 ## Reload Service
 
     sudo systemctl restart mqtt-remote
+
+## Troubleshoot Service
+
+    sudo systemctl stop mqtt-remote
+    python main.py

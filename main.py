@@ -46,8 +46,9 @@ class Remote():
                 key = categorize(event).keycode
 
                 # process action for code
-                if code in self.actions:
-                    action = actions[code]
+                if key in self.actions:
+                    action = actions[key]
+                    print(key, action)
                     self.sense.clear(action['RGB'])
                     self.client.connect("ha", 8883)
                     self.client.publish(action['topic'], action['msg'])
@@ -62,8 +63,23 @@ if __name__ == '__main__':
 
     dev = "/dev/input/by-id/usb-flirc.tv_flirc-if01-event-kbd"
     actions = {
-        11: {
+        "KEY_0" : {
             "RGB": RED,
+            "topic": "remote/living_room_light",
+            "msg": "toggle"
+        },
+        "KEY_1" : {
+            "RGB": GREEN,
+            "topic": "remote/living_room_light",
+            "msg": "dim"
+        },
+        "KEY_2" : {
+            "RGB": YELLOW,
+            "topic": "remote/tts",
+            "msg": "wiki_today"
+        },
+        "KEY_3" : {
+            "RGB": BLUE,
             "topic": "remote/living_room_light",
             "msg": "toggle"
         }
